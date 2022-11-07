@@ -264,7 +264,7 @@ char whitespace[] = " \t\r\n\v";
 char symbols[] = "<|>&;()";
 
 int
-gettoken(char **ps, char *es, char **q, char **eq)
+gettoken(char **ps, char *es, char **q, char **eq)//token在*q和*eq之间
 {
   char *s;
   int ret;
@@ -296,7 +296,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
   default:
     ret = 'a';
     while(s < es && !strchr(whitespace, *s) && !strchr(symbols, *s))
-      s++;
+      s++;//s++一直碰到es、whitespace、symbols为止
     break;
   }
   if(eq)
@@ -309,7 +309,7 @@ gettoken(char **ps, char *es, char **q, char **eq)
 }
 
 int
-peek(char **ps, char *es, char *toks)
+peek(char **ps, char *es, char *toks)//从*ps开始的第一个字符是否在*toks里面
 {
   char *s;
 
@@ -341,7 +341,14 @@ parsecmd(char *s)
   nulterminate(cmd);
   return cmd;
 }
-
+/**
+ * @brief 解析一整行命令。形如echo hello world | grep -E hel+ & ls -l . ; cat /etc/passwd。
+ * 用parsepipe解析含管道的命令。用parseline解析被';'分隔的命令
+ *
+ * @param ps
+ * @param es
+ * @return struct cmd*
+ */
 struct cmd*
 parseline(char **ps, char *es)
 {
@@ -358,7 +365,13 @@ parseline(char **ps, char *es)
   }
   return cmd;
 }
-
+/**
+ * @brief 解析命令，可包含'|'(pipe)。如果包含管道，cmd会被包装成type为PIPE的组合命令，由左命令和右命令组成。
+ * 
+ * @param ps 要解析字符串起始地址的地址
+ * @param es 要解析字符串的结尾地址
+ * @return struct cmd* 
+ */
 struct cmd*
 parsepipe(char **ps, char *es)
 {
@@ -412,7 +425,13 @@ parseblock(char **ps, char *es)
   cmd = parseredirs(cmd, ps, es);
   return cmd;
 }
-
+/**
+ * @brief 得到命令和参数，一直解析到结尾或遇到"|)&;"
+ *
+ * @param ps 要解析字符串起始地址的地址
+ * @param es 要解析字符串的结尾地址
+ * @return struct cmd* 解析得到的命令
+ */
 struct cmd*
 parseexec(char **ps, char *es)
 {
