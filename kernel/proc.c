@@ -310,6 +310,8 @@ fork(void)
 
   safestrcpy(np->name, p->name, sizeof(p->name));
 
+  np->trace_mask = p->trace_mask;
+
   pid = np->pid;
 
   release(&np->lock);
@@ -680,4 +682,16 @@ procdump(void)
     printf("%d %s %s", p->pid, state, p->name);
     printf("\n");
   }
+}
+
+uint64
+nproc_size()
+{
+  uint64 nproc=0;
+  for(uint64 i=0; i<NPROC; i++){
+    if (proc[i].state!=UNUSED){
+      nproc++;
+    }
+  }
+  return nproc;
 }
