@@ -71,10 +71,28 @@ sys_sleep(void)
 
 
 #ifdef LAB_PGTBL
+#define PGACCESS_MAX_LEN 1024
 int
 sys_pgaccess(void)
 {
   // lab pgtbl: your code here.
+  uint64 base;
+  int len;
+  uint64 mask;
+  argaddr(0, &base);
+  argint(1, &len);
+  argaddr(2, &mask);
+  if (len>PGACCESS_MAX_LEN){
+    return 1;
+  }
+  char mask2[PGACCESS_MAX_LEN/8];
+  memset(mask2, 0 , PGACCESS_MAX_LEN/8);
+
+  struct proc *p=myproc();
+  pagetable_t pagetable = p->pagetable; 
+  pgaccess(pagetable, base, len, mask2);
+  copyout(pagetable, mask, mask2, (len+7)/8);
+
   return 0;
 }
 #endif

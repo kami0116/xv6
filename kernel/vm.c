@@ -437,3 +437,47 @@ copyinstr(pagetable_t pagetable, char *dst, uint64 srcva, uint64 max)
     return -1;
   }
 }
+
+static void
+do_vmprint(pagetable_t pagetable, char* prefix)
+{
+  char child_prefix[10]=" ..";
+  memmove(child_prefix+3, prefix, strlen(prefix));
+  for(int i=0;i<512;i++){
+    pte_t pte = pagetable[i];
+    if (pte & PTE_V){
+      printf("%s%d: pte %p pa %p\n", prefix, i, pte, PTE2PA(pte));
+      if ((pte & (PTE_R|PTE_W|PTE_X))==0){
+        do_vmprint((pagetable_t)PTE2PA(pte), child_prefix);
+      }
+    }
+  }
+}
+
+void
+vmprint(pagetable_t pagetable)
+{
+  printf("page table %p\n", pagetable);
+  do_vmprint(pagetable, " ..");
+}
+
+int
+pgaccess(pagetable_t pagetable, uint64 base, int len, void *mask)
+{
+  pte_t *pte;
+  int i=0;
+  uint64 pg = PGROUNDDOWN(base);
+  int offset=0;
+  for ( ;i<len;i++, pg+=PGSIZE, offset++){
+    pte = walk(pagetable, pg , 0);
+    if(*pte & PTE_A){
+      *pte&=~PTE_A;
+      if (offset>7){
+        mask+=offset/8;
+        offset%=8;
+      }
+      *(char *)mask |= 1<<offset;
+    }
+  }
+  return 0;
+}
