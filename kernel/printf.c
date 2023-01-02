@@ -133,3 +133,12 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+void
+backtrace(void)
+{
+  for (uint64 fp = r_fp(); fp>0x80000000; fp=*(uint64 *)(fp-16))
+  {
+    printf("%p\n", *(uint64 *)(fp-8));
+  }
+}

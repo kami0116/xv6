@@ -1,0 +1,19 @@
+1. Which registers contain arguments to functions? For example, which register holds 13 in main's call to printf?
+a0
+
+2. Where is the call to function f in the assembly code for main? Where is the call to g? (Hint: the compiler may inline functions.)Where is the call to function f in the assembly code for main? Where is the call to g? (Hint: the compiler may inline functions.)
+没有call方法f，直接在编译阶段给他算出来了，结果是12。然后给a1赋值为12
+
+3. At what address is the function printf located?
+0x64a
+
+4. What value is in the register ra just after the jalr to printf in main?
+0x3a，就是jalr的指令地址
+
+5. The output depends on that fact that the RISC-V is little-endian. If the RISC-V were instead big-endian what would you set i to in order to yield the same output? Would you need to change 57616 to a different value?
+HE110 World， 如果是大端模式，i=0x726c6400
+
+6. In the following code, what is going to be printed after 'y='? (note: the answer is not a specific value.) Why does this happen?In the following code, what is going to be printed after 'y='? (note: the answer is not a specific value.) Why does this happen?
+不确定，取决于a2的值
+
+
